@@ -395,7 +395,7 @@ class DocumentationGenerator
         foreach ($reflectionMethods as $reflectionMethod) {
             $reflectionReturnType = $reflectionMethod->getReturnType();
 
-            if ( ! ($reflectionReturnType instanceof \ReflectionNamedType)) {
+            if ( ! $reflectionReturnType instanceof \ReflectionNamedType) {
                 continue;
             }
 
@@ -835,6 +835,20 @@ class DocumentationGenerator
             return ['\\' . now()::class];
         }
 
+        if (str_starts_with($castType, 'encrypted')) {
+            if ('encrypted' === $castType) {
+                return ['string'];
+            }
+
+            $typeParam = explode(':', $castType, 2)[1] ?? 'string';
+
+            if ( ! $typeParam) {
+                return ['string'];
+            }
+
+            $castType = $typeParam;
+        }
+
         switch ($castType) {
             case 'int':
             case 'integer':
@@ -887,7 +901,7 @@ class DocumentationGenerator
 
             $castInstance = $castReflection->newInstance();
 
-            if ( ! ($castInstance instanceof CastsAttributes)) {
+            if ( ! $castInstance instanceof CastsAttributes) {
                 return [self::makeAbsoluteClassName($castType)];
             }
 
